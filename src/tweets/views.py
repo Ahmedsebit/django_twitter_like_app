@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
+from django.db.models import Q
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
 from .mixins import FormUserNeededMixin, UserOwnerMixin
 # Create your views here.
@@ -28,14 +29,18 @@ class TweetDetailView(DetailView):
     queryset = Tweet.objects.all()
 
 class TweetListlView(ListView):
-
     def get_queryset(self, *args, **kwargs):
         qs = Tweet.objects.all()
         query = self.request.GET.get("q", None)
         if query is not None:
-            qs = qs.filter(content__icontains=query)
+            qs = qs.filter(
+                Q(content__icontains=query) |
+                Q(user__username__icontains=query) 
+                )
         return qs
 
-    def get_object(self):
+    def get_context_data(self, *args, **kwargs):
         context = super(TweetListlView, self).get_context_data(*args, **kwargs)
+        context['create_form'] = TweetModelForm()
+        context['create_url'] = reverse_lazy("tweet:create")
         return context

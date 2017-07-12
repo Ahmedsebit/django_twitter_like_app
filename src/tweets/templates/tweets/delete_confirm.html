@@ -1,5 +1,12 @@
-<form class="form" method="POST" action="">
+
+
+{% extends "base.html" %}
+{% block title%}{{block.super}} | Home {% endblock title %}
+
+{% block content %}
+    <form class="form" method="POST" action="">
     {% csrf_token %}
     <p>Are you sure you want to delete "{{object}}"<p>
     <input type="submit" value="Delete">
 </form>
+{% endblock content %}
